@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { Mail, Phone, Trash2, Building2, Globe2, Send, PhoneCall } from "lucide-react";
+import { Mail, Phone, Trash2, Building2, Globe2, Send, PhoneCall, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Calendar } from "../ui/calendar";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "../ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
@@ -80,11 +83,24 @@ export const LeadSheet = ({ lead, onClose, onUpdate, onDelete }) => {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block">
+              <div className="block">
                 <span className="text-sm font-semibold">Follow-up date</span>
-                <input type="date" data-testid="lead-detail-followup-input" className={`${inp} mt-2`} value={lead.follow_up_date || ""}
-                  onChange={(e) => patch(e.target.value ? { follow_up_date: e.target.value } : { clear_follow_up: true }, "Follow-up updated")} />
-              </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button data-testid="lead-detail-followup-input" className={`${inp} mt-2 flex items-center gap-2 text-left`}>
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                      {lead.follow_up_date ? new Date(lead.follow_up_date + "T00:00:00").toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : <span className="text-muted-foreground">Pick a date</span>}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={lead.follow_up_date ? new Date(lead.follow_up_date + "T00:00:00") : undefined}
+                      onSelect={(d) => patch(d ? { follow_up_date: format(d, "yyyy-MM-dd") } : { clear_follow_up: true }, "Follow-up updated")} initialFocus />
+                    {lead.follow_up_date && (
+                      <button onClick={() => patch({ clear_follow_up: true }, "Follow-up cleared")} data-testid="lead-detail-followup-clear" className="w-full border-t border-border py-2.5 text-sm text-destructive hover:bg-secondary">Clear date</button>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
               <label className="block">
                 <span className="text-sm font-semibold">Lead source</span>
                 <div className="mt-2 flex gap-2">

@@ -28,3 +28,8 @@ Premium, conversion-focused B2B lead-generation website for BuildVVO Technologie
 - P1: Real GymBoss_VVO screenshots, more case studies when available
 - P2: Prerendering / sitemap.xml with final domain for stronger SEO
 - P2: Multiple admin users / roles
+
+## Iteration 2 (2026-06) — Responsiveness
+- Global overflow-x clip; GymBoss mockup stacks on mobile
+- Admin: mobile bottom tab bar, lead cards on mobile, compact stat cards, chart label fixes, Recent enquiries + Upcoming follow-ups cards, shadcn calendar for follow-up date
+- Tested: backend 23/23, all pages 0 horizontal overflow at 390/768/1920

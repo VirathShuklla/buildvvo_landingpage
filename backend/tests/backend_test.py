@@ -179,6 +179,23 @@ def test_stats(auth_headers):
         assert k in s
     assert isinstance(s["by_status"], list)
     assert len(s["daily"]) == 30
+    # New fields for Overview widgets
+    assert "recent" in s and isinstance(s["recent"], list)
+    assert "upcoming_follow_ups" in s and isinstance(s["upcoming_follow_ups"], list)
+
+
+def test_stats_recent_and_upcoming_populate(auth_headers):
+    # Create a lead and set a future follow-up date => must appear in upcoming_follow_ups
+    pid = _create_lead("TEST_UpcomingUser", "test_upcoming@example.com")
+    r = requests.patch(f"{API}/leads/{pid}",
+                       json={"follow_up_date": "2026-12-15", "status": "Qualified"},
+                       headers=auth_headers, timeout=10)
+    assert r.status_code == 200
+    s = requests.get(f"{API}/stats", headers=auth_headers, timeout=10).json()
+    ids_recent = [x["id"] for x in s["recent"]]
+    ids_upcoming = [x["id"] for x in s["upcoming_follow_ups"]]
+    assert pid in ids_recent, "freshly created lead should be in recent"
+    assert pid in ids_upcoming, "lead with future follow_up_date should be in upcoming_follow_ups"
 
 
 # ---------- Events ----------
