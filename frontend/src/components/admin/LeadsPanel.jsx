@@ -53,18 +53,18 @@ export const LeadsPanel = ({ onChange }) => {
 
   return (
     <div className="space-y-6" data-testid="admin-leads-panel">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="flex items-end justify-between gap-3">
         <div>
           <p className="eyebrow mb-2">Pipeline</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold">Leads <span className="text-muted-foreground font-bold text-2xl" data-testid="admin-leads-count">({leads.length})</span></h1>
+          <h1 className="text-2xl sm:text-4xl font-extrabold">Leads <span className="text-muted-foreground font-bold text-xl sm:text-2xl" data-testid="admin-leads-count">({leads.length})</span></h1>
         </div>
-        <button onClick={() => exportCsv(leads)} disabled={!leads.length} data-testid="admin-export-csv-button" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-primary disabled:opacity-50 transition-colors">
-          <Download className="h-4 w-4" /> Export CSV
+        <button onClick={() => exportCsv(leads)} disabled={!leads.length} data-testid="admin-export-csv-button" className="shrink-0 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-primary disabled:opacity-50 transition-colors">
+          <Download className="h-4 w-4" /> <span className="hidden sm:inline">Export</span> CSV
         </button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr_1fr]">
-        <label className="relative">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr]">
+        <label className="relative col-span-2 md:col-span-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input data-testid="admin-leads-search-input" value={filters.q} onChange={setF("q")} placeholder="Search name, company, email, phone…" className={`${sel} w-full pl-10`} />
         </label>
@@ -74,13 +74,41 @@ export const LeadsPanel = ({ onChange }) => {
         <select data-testid="admin-filter-source" value={filters.source} onChange={setF("source")} className={sel}>
           <option value="">All sources</option>{SOURCES.map((s) => <option key={s}>{s}</option>)}
         </select>
-        <select data-testid="admin-filter-software" value={filters.software_type} onChange={setF("software_type")} className={sel}>
+        <select data-testid="admin-filter-software" value={filters.software_type} onChange={setF("software_type")} className={`${sel} col-span-2 md:col-span-1`}>
           <option value="">All software types</option>{SOFTWARE_TYPES.map((s) => <option key={s}>{s}</option>)}
         </select>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="md:hidden space-y-3" data-testid="admin-lead-cards">
+        {leads.map((l) => {
+          const overdue = l.follow_up_date && l.follow_up_date <= today() && !["Won", "Lost"].includes(l.status);
+          return (
+            <div key={l.id} onClick={() => setActiveId(l.id)} data-testid={`lead-card-${l.id}`} className="rounded-2xl border border-border bg-card p-4 active:bg-secondary/50 transition-colors">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold flex items-center gap-2 truncate">{l.name}{l.consultation && <PhoneCall className="h-3.5 w-3.5 text-primary shrink-0" />}</p>
+                  <p className="text-xs text-muted-foreground truncate">{l.company || "—"} · {l.phone}</p>
+                </div>
+                <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                  <StatusSelect value={l.status} onChange={(s) => changeStatus(l, s)} testid={`lead-card-status-select-${l.id}`} />
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+                <span className="rounded-full bg-secondary px-2.5 py-1">{l.software_type}</span>
+                <span className="rounded-full bg-secondary px-2.5 py-1 font-mono">{l.budget}</span>
+                <span className="rounded-full bg-secondary px-2.5 py-1">{l.source}</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+                <span>{fmtDate(l.created_at)}</span>
+                {l.follow_up_date && <span className={`inline-flex items-center gap-1 ${overdue ? "text-amber-600 dark:text-amber-400 font-semibold" : ""}`}><CalendarClock className="h-3.5 w-3.5" />{fmtDate(l.follow_up_date)}</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card overflow-hidden max-md:border-0 max-md:bg-transparent">
+        <div className="overflow-x-auto hidden md:block">
           <table className="w-full text-sm" data-testid="admin-lead-table">
             <thead className="bg-secondary/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>

@@ -321,8 +321,15 @@ async def delete_lead(lead_id: str, user: dict = Depends(get_current_user)):
 
 @api.get("/stats")
 async def stats(user: dict = Depends(get_current_user)):
-    leads = await db.leads.find({}, {"status": 1, "source": 1, "software_type": 1, "budget": 1,
+    leads = await db.leads.find({}, {"status": 1, "source": 1, "software_type": 1, "budget": 1, "name": 1, "company": 1,
                                      "consultation": 1, "created_at": 1, "follow_up_date": 1}).to_list(10000)
+    brief = lambda l: {"id": str(l["_id"]), "name": l.get("name"), "company": l.get("company", ""), "status": l.get("status"),
+                       "software_type": l.get("software_type"), "budget": l.get("budget"),
+                       "created_at": l.get("created_at"), "follow_up_date": l.get("follow_up_date")}
+    recent = [brief(l) for l in sorted(leads, key=lambda l: l.get("created_at") or "", reverse=True)[:5]]
+    upcoming = [brief(l) for l in sorted(
+        [l for l in leads if l.get("follow_up_date") and l.get("status") not in ("Won", "Lost")],
+        key=lambda l: l["follow_up_date"])[:6]]
     total = len(leads)
     by = lambda key, keys=None: _count(leads, key, keys)
     won = sum(1 for l in leads if l.get("status") == "Won")
@@ -358,6 +365,8 @@ async def stats(user: dict = Depends(get_current_user)):
         "by_software": by("software_type"),
         "by_budget": by("budget", BUDGETS),
         "daily": list(daily.values()),
+        "recent": recent,
+        "upcoming_follow_ups": upcoming,
     }
 
 

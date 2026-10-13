@@ -8,14 +8,14 @@ const members = [
 ];
 
 export const GymBossMockup = () => (
-  <div data-testid="gymboss-mockup" className="relative grid grid-cols-[1fr_auto] gap-4 sm:gap-6 items-end">
+  <div data-testid="gymboss-mockup" className="relative grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 sm:gap-6 items-end">
     <div className="rounded-[20px] border border-white/10 bg-[#0B1528] text-cream overflow-hidden shadow-2xl">
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10">
         <div className="flex items-center gap-2">
           <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand"><Dumbbell className="h-3.5 w-3.5" /></span>
           <span className="font-display font-bold text-sm">GymBoss<span className="text-brand">_VVO</span></span>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-widest text-cream/40">Admin · Main Branch</span>
+        <span className="hidden sm:inline font-mono text-[9px] uppercase tracking-widest text-cream/40">Admin · Main Branch</span>
       </div>
       <div className="p-4 sm:p-5 space-y-4">
         <div className="grid grid-cols-3 gap-2">
@@ -39,7 +39,7 @@ export const GymBossMockup = () => (
         </div>
       </div>
     </div>
-    <div className="w-[118px] sm:w-[150px] rounded-[26px] border-[5px] border-[#1E2D4A] bg-cream text-navy p-3 shadow-2xl animate-floaty">
+    <div className="hidden sm:block w-[130px] lg:w-[150px] rounded-[26px] border-[5px] border-[#1E2D4A] bg-cream text-navy p-3 shadow-2xl animate-floaty">
       <div className="mx-auto h-1 w-10 rounded-full bg-navy/20 mb-3" />
       <p className="font-display text-xs font-bold">Hi Arjun</p>
       <p className="text-[9px] text-navy/55">Your membership has expired</p>
