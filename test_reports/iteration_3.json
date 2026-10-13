@@ -1,0 +1,36 @@
+{
+  "summary": "Frontend-only testing of new Lead Pipeline Board (drag-and-drop status board). All 7 requested scenarios verified end-to-end via Playwright on the public preview URL. Board is the default view, all 6 columns with correct test-ids and live counts render; mouse drag-and-drop (dnd-kit PointerSensor with >6px activation) updates lead status, shows toast, persists after reload (confirmed via GET /api/leads), and updates column counts and the Overview stat-won-value. Clicking a card without dragging opens lead-detail-sheet. View toggle (board/table) is persisted in localStorage key 'bvvo_leads_view'. Search filter applies to board view. At 1920 desktop all 6 columns fit without any page-level horizontal overflow (board scrollWidth == clientWidth == 1336, page overflow 0). On 390 mobile, board scrolls horizontally internally (scrollWidth 1592 vs clientWidth 390) with page overflow 0.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results": {
+    "board_default_view": "PASS - admin-lead-board visible on first entering Leads tab",
+    "six_columns_and_counts": "PASS - board-column-{new,contacted,qualified,proposal-sent,won,lost} and board-column-count-* present; counts update live after drag",
+    "drag_updates_status_and_toast": "PASS - dragging TEST_Charlie from New->Qualified: toast 'TEST_Charlie moved to Qualified' shown, column counts new 4->3 and qualified 0->1",
+    "status_persisted_after_reload": "PASS - GET /api/leads shows status=Qualified; after reload card remains in Qualified column",
+    "click_without_drag_opens_sheet": "PASS - lead-detail-sheet opens on simple click (dnd-kit distance:6px activation prevents accidental drag)",
+    "view_toggle_persisted": "PASS - admin-leads-view-table switches to table, localStorage bvvo_leads_view='table', table persists after reload; admin-leads-view-board returns to board",
+    "filters_in_board": "PASS - search 'TEST_Char' leaves only 1 matching card in the board",
+    "desktop_1920_no_horizontal_scroll": "PASS - board scrollWidth=clientWidth=1336, document.documentElement overflow=0",
+    "mobile_390_board_scrolls_no_page_overflow": "PASS - board scrollWidth=1592 > clientWidth=390 (internal scroll), page overflow=0",
+    "overview_stat_won_updates": "PASS - after moving TEST_Bravo to Won, stat-won-value=1 in Overview tab"
+  },
+  "test_report_links": ["/app/test_reports/pytest/pytest_results.xml (from iteration_2, unchanged)"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "LeadBoard.jsx: optimistic update is implemented in LeadsPanel.moveLead (good) with rollback on error. Clean.",
+    "DraggableCard applies {...listeners} on the wrapper AND an onClick to open sheet - works thanks to PointerSensor activationConstraint distance:6, so quick taps are treated as click. Confirmed in testing.",
+    "Minor: toast message uses `${lead.name} moved to ${status}` from the pre-move lead snapshot - works correctly.",
+    "Minor: board uses `grid-flow-col auto-cols-[minmax(250px,1fr)] xl:auto-cols-[minmax(0,1fr)]` which fits six columns on >=xl (>=1280px). Below xl desktops will still scroll horizontally; acceptable per spec which only requires 1920 to fit without scroll."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not retested, iteration_2 23/23)", "frontend": "100% (10/10 scenarios)"},
+  "test_credentials": "Admin buildvvo / buildvvo@2026 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Created 3 leads (TEST_Alpha, TEST_Bravo, TEST_Charlie) via POST /api/leads during a previous script run; subsequent runs reused them (reset to status=New) and the final run DELETE'd all 3 (status 200). The one real lead 'Arc Track' was left untouched (verified still status=New).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "LeadBoard feature fully working. If retesting, seed TEST_ leads via POST /api/leads with budget value exactly from Literal list (e.g. '₹1.5L–₹5L'); description min 10 chars. For dnd-kit drag use mouse.down, small jiggle move >6px, then stepped move to target column, then mouse.up. Admin token stored in localStorage key 'bvvo_token'. View toggle key 'bvvo_leads_view'. Clean up TEST_* leads with DELETE /api/leads/{id} after tests. Do NOT delete the real 'Arc Track' lead."
+}
