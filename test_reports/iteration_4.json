@@ -1,0 +1,43 @@
+{
+  "summary": "Iteration 4 — Website Development service + Sales RBAC team logins. Both backend and frontend verified end-to-end on the public preview URL. Backend: 23/23 regression + 16/16 new RBAC/Team tests passing (39/39). Frontend: all requested flows pass — home 4-col grid with 7 service tiles + 8th CTA tile (home-service-card-not-sure), home-service-card-website-development present, /services and footer list Website Development, /services/website-development loads with its own H1, /contact?service=Website preselects lead-form-type-website on step 2, admin Team panel can create/duplicate-error/toggle-active/reset-password/delete sales users, sales user login shows role badge 'SALES · <name>', only Leads tab visible, mobile tabbar hidden for sales. No horizontal overflow at 1920 or 390.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_results": {
+    "home_website_dev_tile": "PASS - home-service-card-website-development present",
+    "home_grid_8_tiles_cta": "PASS - 8 total tiles including home-service-card-not-sure CTA linking to /contact",
+    "no_horizontal_overflow": "PASS - 1920 overflow=0, 390 overflow=0",
+    "services_detail_page": "PASS - /services/website-development loads with H1 'Fast, premium websites that turn visitors into enquiries.' and SEO title",
+    "services_list_and_footer": "PASS - both include Website Development",
+    "contact_preselect_website": "PASS - step 2 /contact?service=Website shows lead-form-type-website preselected (highlighted with checkmark)",
+    "admin_team_create": "PASS - sales user created via team-name/username/password inputs + create button",
+    "admin_team_duplicate_error": "PASS - 409 and error visible to user",
+    "admin_team_reset_password": "PASS - toggle+save works; sales can then log in with new password only",
+    "admin_team_toggle_active": "PASS - 'Disabled' badge appears after toggling off, hidden after toggling on",
+    "admin_team_delete": "PASS - team-delete + team-delete-confirm removes user from list",
+    "sales_login_badge": "PASS - admin-role-badge shows 'SALES · TEST UX SALES'",
+    "sales_only_leads_tab": "PASS - overview/team/settings tabs absent, admin-mobile-tabbar hidden (TABS.length < 2 branch)",
+    "backend_rbac": "PASS - sales GET /leads 200, PATCH 200, POST /notes 200 (note author=name), DELETE /leads 403, GET /stats 403, GET/POST /users 403, PUT /settings 403; disabled sales existing token->401 and new login->401; reset password works (old 401, new 200); admin PATCH/DELETE on admin user id returns 404 (sales_user role filter); username pattern + password min length return 422; duplicate 409"
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_team_rbac.py",
+    "/app/test_reports/pytest/pytest_team_rbac.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py: PERMS clean mapping; require() dependency is idiomatic. Good.",
+    "server.py sales_user() filters role==sales so admin cannot modify/delete admin via /users/{id} (returns 404). Correct for safety; however this also prevents an admin from managing other future admin accounts — acceptable for current single-admin model.",
+    "server.py update_user uses find_one_and_update without return_document=ReturnDocument.AFTER; motor defaults to BEFORE. Verify: it works in tests because fixtures re-fetch, but the API returns stale data to the Team UI (shows pre-update active/name until manual refresh). TeamPanel.jsx compensates by setting the local list from the response — users may see the switch flicker back momentarily. Minor UX issue; main agent may want to pass return_document=ReturnDocument.AFTER. Note: the e2e UI test still showed Disabled badge appearing correctly, likely because frontend sends the new state optimistically via the response body; worth double-checking.",
+    "server.py login endpoint computes locked_until via a two-step update (first $inc then conditional set) which could race under concurrent attempts; acceptable for small scale.",
+    "TeamPanel.jsx exposes new sales user password as plain text input (type='text') — intentional for admin visibility but ensure Team page is only reachable by admins (it is, via role gate)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_team_rbac.py (new)"
+  ],
+  "success_rate": {"backend": "100% (39/39)", "frontend": "100% (all 7 request scenarios)"},
+  "test_credentials": "Admin buildvvo / buildvvo@2026 (from /app/memory/test_credentials.md). Sales user is created+deleted per test.",
+  "seed_data_creation": "Created transient TEST_ sales users via API/UI (test.sales<ts> and test.ux<ts>) and one TEST_RBACLead; all deleted at end. Verified real 'Arc Track' lead untouched. No leftover TEST_ leads or users.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Sales RBAC and Team panel are fully working. Admin login button uses text 'Sign in' (not type=submit); use button:has-text('Sign in'). Role badge testid = admin-role-badge, mobile tabbar testid = admin-mobile-tabbar (hidden via class 'hidden' when TABS.length < 2). Lead form type pills on /contact use data-testid='lead-form-type-<slug>' on Step 2 (need to pass step 1 first unless using ?service= which preselects). Minor code-review note on find_one_and_update return_document in /api/users PATCH — not blocking."
+}

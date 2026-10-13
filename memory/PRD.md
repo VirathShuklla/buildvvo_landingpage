@@ -36,3 +36,9 @@ Premium, conversion-focused B2B lead-generation website for BuildVVO Technologie
 
 ## Iteration 3 (2026-06) — Lead Pipeline Board
 - Drag-and-drop status board (@dnd-kit/core) in Leads tab with Board/List toggle (remembered), touch press-and-hold support, optimistic updates w/ rollback
+
+## Iteration 4 (2026-06)
+- Website Development service (/services/website-development), "Website" lead type, 4-col home services grid + CTA tile
+- Sales team logins: admin Team tab (create, disable, reset password, delete); RBAC (sales = leads only, no delete)
+- README rewritten: tech stack, credentials, local run, deploy (Atlas + Render/Railway + Vercel), API reference; vercel.json + requirements-deploy.txt
+- Tested 39/39 backend, all frontend flows
