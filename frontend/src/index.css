@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 43 41% 95%;
+        --foreground: 219 54% 14%;
+        --card: 0 0% 100%;
+        --card-foreground: 219 54% 14%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 219 54% 14%;
+        --primary: 230 79% 60%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 43 26% 91%;
+        --secondary-foreground: 219 54% 14%;
+        --muted: 43 26% 91%;
+        --muted-foreground: 218 14% 36%;
+        --accent: 43 26% 91%;
+        --accent-foreground: 219 54% 14%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 40 18% 85%;
+        --input: 40 18% 82%;
+        --ring: 230 79% 60%;
+        --chart-1: 230 79% 60%;
+        --chart-2: 219 54% 14%;
+        --chart-3: 160 55% 42%;
+        --chart-4: 38 85% 58%;
+        --chart-5: 350 70% 58%;
+        --radius: 0.75rem;
+        --navy: 219 54% 14%;
+        --cream: 43 41% 95%;
+    }
+    .dark {
+        --background: 219 54% 14%;
+        --foreground: 43 41% 95%;
+        --card: 219 52% 17%;
+        --card-foreground: 43 41% 95%;
+        --popover: 219 52% 17%;
+        --popover-foreground: 43 41% 95%;
+        --primary: 230 79% 64%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 219 45% 21%;
+        --secondary-foreground: 43 41% 95%;
+        --muted: 219 45% 20%;
+        --muted-foreground: 218 14% 68%;
+        --accent: 219 45% 21%;
+        --accent-foreground: 43 41% 95%;
+        --destructive: 0 62% 50%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 219 35% 25%;
+        --input: 219 35% 28%;
+        --ring: 230 79% 64%;
+        --chart-2: 43 41% 85%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        @apply bg-background text-foreground font-body antialiased;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    h1, h2, h3, h4 {
+        @apply font-display;
+        letter-spacing: -0.02em;
+    }
+    ::selection {
+        background: #4965e9;
+        color: #fff;
+    }
+}
+
+@layer components {
+    .container-x {
+        @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12;
+    }
+    .eyebrow {
+        @apply font-mono text-[11px] uppercase tracking-[0.22em] text-primary;
+    }
+    .section-y {
+        @apply py-20 sm:py-28 lg:py-32;
+    }
+    .grid-bg {
+        background-image:
+            linear-gradient(hsl(var(--foreground) / 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
+        background-size: 56px 56px;
+    }
+    .grain::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .lift {
+        transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+    .lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 48px -24px rgba(16, 29, 53, 0.25);
+        border-color: hsl(var(--primary) / 0.4);
+    }
+}
+
+@keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.animate-floaty { animation: floaty 7s ease-in-out infinite; }
+
+@keyframes growbar {
+    from { transform: scaleY(0.1); }
+    to { transform: scaleY(1); }
+}
+.bar-grow { transform-origin: bottom; animation: growbar 1.2s cubic-bezier(.2,.8,.2,1) both; }
+
+@keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); }
+    100% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
+}
+.wa-pulse { animation: pulse-ring 2.2s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

@@ -1,0 +1,135 @@
+{
+  "project_name": "BuildVVO Technologies Website & Admin Dashboard",
+  "brand_identity": {
+    "company_name": "BuildVVO Technologies Private Limited",
+    "tagline": "Your Business Is Unique. Your Software Should Be Too.",
+    "subheadline": "We build custom software, web applications, and business automation solutions that simplify operations and help businesses grow.",
+    "archetype": "Swiss Tech Precision & Warm Editorial Architecture",
+    "emotional_tone": "Authoritative, Bespoke, High-Yield Engineering, Frictionless Trust"
+  },
+  "theme_and_colors": {
+    "palette": {
+      "deep_navy": "#101D35",
+      "cream": "#F7F4ED",
+      "white": "#FFFFFF",
+      "accent_blue": "#4965E9",
+      "accent_blue_hover": "#3651D4",
+      "navy_muted": "#1E2D4A",
+      "cream_muted": "#EFECE4",
+      "text_dark": "#0D1527",
+      "text_light": "#F7F4ED",
+      "border_dark": "rgba(255, 255, 255, 0.12)",
+      "border_light": "rgba(16, 29, 53, 0.12)"
+    },
+    "mode_rules": {
+      "light_mode": {
+        "bg_primary": "#F7F4ED",
+        "bg_secondary": "#FFFFFF",
+        "bg_card": "#FFFFFF",
+        "text_primary": "#101D35",
+        "text_muted": "#4B5563",
+        "border_color": "rgba(16, 29, 53, 0.1)"
+      },
+      "dark_mode": {
+        "bg_primary": "#101D35",
+        "bg_secondary": "#0A1324",
+        "bg_card": "#152442",
+        "text_primary": "#F7F4ED",
+        "text_muted": "#9CA3AF",
+        "border_color": "rgba(255, 255, 255, 0.12)"
+      }
+    }
+  },
+  "typography": {
+    "heading_font": "Plus Jakarta Sans, Cabinet Grotesk, or Outfit (Sans Display, tight tracking)",
+    "body_font": "Inter or DM Sans (Clean, high legibility)",
+    "mono_font": "JetBrains Mono or Fira Code (For metrics, software tags & status codes)",
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-semibold",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-muted-foreground",
+      "eyebrow": "text-xs uppercase font-mono tracking-[0.2em] text-[#4965E9]"
+    }
+  },
+  "layout_and_components": {
+    "spacing_philosophy": "Generous spacing system using p-6, p-8, p-12, py-16, py-24. Containers with borders MUST have internal padding to avoid content text collision.",
+    "hero_section": {
+      "headline": "Your Business Is Unique. Your Software Should Be Too.",
+      "subheadline": "We build custom software, web applications, and business automation solutions that simplify operations and help businesses grow.",
+      "primary_cta": "Discuss Your Project",
+      "secondary_cta": "Explore Our Work",
+      "visual": "Interactive bespoke dashboard mockup overlay showing live workflow animation, metrics, and modular custom ERP/CRM elements."
+    },
+    "navigation": {
+      "header_style": "Sticky top bar with glassmorphism backdrop-blur-md bg-[#101D35]/80 or bg-[#F7F4ED]/80, z-50 with 1px border-b",
+      "links": ["Services", "Industries", "Our Work", "About Us", "Contact"],
+      "ctas": ["Discuss Your Project", "Admin Portal Button"]
+    },
+    "multi_step_lead_form": {
+      "steps": [
+        "1. Contact Information (Name, Company, Phone, Email)",
+        "2. Solution Required (ERP, CRM, Web App, Mobile App, Business Automation, Custom SaaS)",
+        "3. Budget Range (Under ₹50K, ₹50K–₹1.5L, ₹1.5L–₹5L, ₹5L+, Not Sure)",
+        "4. Project Scope & Timeline (Description, Expected Timeline)"
+      ],
+      "design": "Clean wizard interface with progress bar, step validation, subtle micro-animations between steps, clear back/next actions.",
+      "redirect": "Redirect to Thank-You page on completion with summary and expected contact timeframe."
+    },
+    "gymboss_vvo_case_study": {
+      "title": "GymBoss_VVO - Custom Fitness & Gym Management ERP",
+      "visual_approach": "Designed UI vector mockups (never raw generic screenshots), showing member tracking, automated WhatsApp check-ins, fee management, and workout plans.",
+      "outcomes": ["Simplified daily check-in flow", "Zero missed membership renewals", "Multi-branch admin control"]
+    },
+    "admin_dashboard": {
+      "purpose": "Internal CRM lead management & editable company contact details",
+      "widgets": [
+        "Lead Metrics Cards (Total Leads, Qualified, Consultations Requested, Conversion Rate)",
+        "Lead Table & Status Pipeline (New, Contacted, Qualified, Proposal Sent, Won, Lost)",
+        "Lead Source & Software Type Breakdown Charts",
+        "Lead Search, Filter, Notes, and Follow-up Date Picker",
+        "Editable Settings Panel (Update WhatsApp number, Email, Office Address, Business Hours)"
+      ]
+    }
+  },
+  "image_urls": {
+    "dashboard_mockup": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzb2Z0d2FyZSUyMGRhc2hib2FyZCUyMFVJJTIwdmVjdG9yJTIwbW9ja3VwJTIwZGFyayUyMG5hdnl8ZW58MHx8fHwxNzkxOTI3ODc0fDA&ixlib=rb-4.1.0&q=85",
+    "mobile_app_mockup": "https://images.unsplash.com/photo-1720135885007-454165745e21?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBzb2Z0d2FyZSUyMGRhc2hib2FyZCUyMFVJJTIwdmVjdG9yJTIwbW9ja3VwJTIwZGFyayUyMG5hdnl8ZW58MHx8fHwxNzkxOTI3ODc0fDA&ixlib=rb-4.1.0&q=85",
+    "team_photo": "https://images.unsplash.com/photo-1674321694640-36fd3201773f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzB8MHwxfHNlYXJjaHw0fHxtaW5pbWFsaXN0JTIwY29ycG9yYXRlJTIwdGVjaCUyMHRlYW0lMjBzb2Z0d2FyZSUyMGRldmVsb3BlcnMlMjBpbmRpYXxlbnwwfHx8fDE3OTE5Mjc4NzR8MA&ixlib=rb-4.1.0&q=85",
+    "gymboss_hero": "https://images.unsplash.com/photo-1637430308606-86576d8fef3c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBneW0lMjB3b3Jrb3V0JTIwaW5kb29yJTIwZml0bmVzcyUyMGVxdWlwbWVudCUyMGRhcmt8ZW58MHx8fHwxNzkxOTI3ODgwfDA&ixlib=rb-4.1.0&q=85"
+  },
+  "testing_and_accessibility": {
+    "mandatory_attribute": "data-testid",
+    "convention": "kebab-case, role-based",
+    "key_elements": [
+      "nav-homepage-link",
+      "nav-services-link",
+      "nav-industries-link",
+      "nav-work-link",
+      "nav-about-link",
+      "nav-contact-link",
+      "hero-discuss-project-button",
+      "hero-explore-work-button",
+      "lead-form-step-1-name-input",
+      "lead-form-step-1-phone-input",
+      "lead-form-step-1-email-input",
+      "lead-form-submit-button",
+      "floating-whatsapp-button",
+      "theme-toggle-button",
+      "admin-dashboard-link",
+      "admin-lead-table",
+      "admin-settings-whatsapp-input"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Ensure the design reflects an elite tech consultancy: deep navy (#101D35), cream (#F7F4ED), accent blue (#4965E9).",
+    "Provide a smooth light/dark mode switcher stored in React state or localStorage.",
+    "Use designed visual mockups for GymBoss_VVO and software previews rather than raw generic unformatted images.",
+    "Implement the full multi-step lead form with budget selectors (Under ₹50K, ₹50K–₹1.5L, ₹1.5L–₹5L, ₹5L+, Not Sure) and lead storage.",
+    "Build the Admin Dashboard with stats, lead pipeline table with status dropdowns (New, Contacted, Qualified, Proposal Sent, Won, Lost), search, filters, notes, and an editable settings panel for contact details (WhatsApp, email, address).",
+    "Keep floating WhatsApp button visible across main pages with quick pre-filled message support.",
+    "Include data-testid on all interactive buttons, inputs, links, and key status elements for automated testing."
+  ]
+}
