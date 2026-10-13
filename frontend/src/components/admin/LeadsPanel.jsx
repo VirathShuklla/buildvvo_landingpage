@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { Download, Search, CalendarClock, PhoneCall } from "lucide-react";
+import { Download, Search, CalendarClock, PhoneCall, Columns3, List } from "lucide-react";
 import { toast } from "sonner";
 import { api, formatErr } from "../../lib/api";
 import { SOFTWARE_TYPES } from "../../data/content";
 import { LeadSheet } from "./LeadSheet";
+import { LeadBoard } from "./LeadBoard";
 import { StatusBadge, StatusSelect, STATUSES } from "./StatusControls";
 
 const SOURCES = ["Google", "Instagram", "LinkedIn", "Facebook", "Direct", "Referral", "WhatsApp", "YouTube"];
@@ -26,6 +27,7 @@ export const LeadsPanel = ({ onChange }) => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ q: "", status: "", source: "", software_type: "" });
   const [activeId, setActiveId] = useState(null);
+  const [view, setView] = useState(() => localStorage.getItem("bvvo_leads_view") || "board");
 
   const load = useCallback(() => {
     setLoading(true);
@@ -48,6 +50,20 @@ export const LeadsPanel = ({ onChange }) => {
     } catch (e) { toast.error(formatErr(e)); }
   };
 
+  const moveLead = async (lead, status) => {
+    const prev = lead.status;
+    setLeads((ls) => ls.map((l) => (l.id === lead.id ? { ...l, status } : l)));
+    try {
+      const { data } = await api.patch(`/leads/${lead.id}`, { status });
+      upsert(data);
+      toast.success(`${lead.name} moved to ${status}`);
+    } catch (e) {
+      setLeads((ls) => ls.map((l) => (l.id === lead.id ? { ...l, status: prev } : l)));
+      toast.error(formatErr(e));
+    }
+  };
+
+  const switchView = (v) => { setView(v); localStorage.setItem("bvvo_leads_view", v); };
   const setF = (k) => (e) => setFilters((f) => ({ ...f, [k]: e.target.value }));
   const active = leads.find((l) => l.id === activeId);
 
@@ -58,9 +74,19 @@ export const LeadsPanel = ({ onChange }) => {
           <p className="eyebrow mb-2">Pipeline</p>
           <h1 className="text-2xl sm:text-4xl font-extrabold">Leads <span className="text-muted-foreground font-bold text-xl sm:text-2xl" data-testid="admin-leads-count">({leads.length})</span></h1>
         </div>
-        <button onClick={() => exportCsv(leads)} disabled={!leads.length} data-testid="admin-export-csv-button" className="shrink-0 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-primary disabled:opacity-50 transition-colors">
-          <Download className="h-4 w-4" /> <span className="hidden sm:inline">Export</span> CSV
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="inline-flex rounded-full border border-border bg-card p-1" data-testid="admin-leads-view-toggle">
+            {[["board", Columns3, "Board"], ["table", List, "List"]].map(([v, I, label]) => (
+              <button key={v} onClick={() => switchView(v)} data-testid={`admin-leads-view-${v}`} aria-label={`${label} view`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors ${view === v ? "bg-navy text-cream dark:bg-cream dark:text-navy" : "text-muted-foreground hover:text-foreground"}`}>
+                <I className="h-4 w-4" /><span className="hidden sm:inline">{label}</span>
+              </button>
+            ))}
+          </div>
+          <button onClick={() => exportCsv(leads)} disabled={!leads.length} data-testid="admin-export-csv-button" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-primary disabled:opacity-50 transition-colors">
+            <Download className="h-4 w-4" /> <span className="hidden sm:inline">Export</span> CSV
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-3 grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr]">
@@ -79,6 +105,9 @@ export const LeadsPanel = ({ onChange }) => {
         </select>
       </div>
 
+      {view === "board" ? (
+        <LeadBoard leads={leads} onMove={moveLead} onOpen={setActiveId} />
+      ) : (<>
       <div className="md:hidden space-y-3" data-testid="admin-lead-cards">
         {leads.map((l) => {
           const overdue = l.follow_up_date && l.follow_up_date <= today() && !["Won", "Lost"].includes(l.status);
@@ -148,6 +177,7 @@ export const LeadsPanel = ({ onChange }) => {
         )}
         {loading && !leads.length && <p className="py-16 text-center text-muted-foreground text-sm">Loading leads…</p>}
       </div>
+      </>)}
 
       <LeadSheet lead={active} onClose={() => setActiveId(null)} onUpdate={upsert} onDelete={remove} />
     </div>

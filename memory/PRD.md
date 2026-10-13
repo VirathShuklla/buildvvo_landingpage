@@ -33,3 +33,6 @@ Premium, conversion-focused B2B lead-generation website for BuildVVO Technologie
 - Global overflow-x clip; GymBoss mockup stacks on mobile
 - Admin: mobile bottom tab bar, lead cards on mobile, compact stat cards, chart label fixes, Recent enquiries + Upcoming follow-ups cards, shadcn calendar for follow-up date
 - Tested: backend 23/23, all pages 0 horizontal overflow at 390/768/1920
+
+## Iteration 3 (2026-06) — Lead Pipeline Board
+- Drag-and-drop status board (@dnd-kit/core) in Leads tab with Board/List toggle (remembered), touch press-and-hold support, optimistic updates w/ rollback
