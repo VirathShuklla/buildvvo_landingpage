@@ -1,0 +1,36 @@
+{
+  "summary": "First test run. Comprehensive backend + frontend testing of BuildVVO lead-gen site. 22 pytest tests (all passing). Full Playwright UI journeys covered: public nav, hero CTAs, 4-step lead form with validation and ?service= preselect, thank-you redirect, floating WhatsApp with wa.me using settings number, theme toggle persistence, mobile 390 overflow, service detail pages, admin login (wrong + correct), /admin protected redirect, overview stats, leads tab, inline status change, lead sheet (note add, source edit+save, follow-up date, delete+confirm), admin settings update (whatsapp/phone/address/email) + public reflection + restore to defaults, no 'Made with Emergent' watermark. All critical flows pass.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/auth/login", "issue": "Brute-force lockout works but requires ~10 attempts instead of the documented 5. Two likely causes: (1) K8s ingress routes requests to multiple backend replicas each having its own request.client.host, producing different identifiers; (2) read-modify-write pattern 'count = (attempt or {}).get(count,0)+1' with $set is not atomic — concurrent requests can lose increments. Recommended fix: use $inc with findOneAndUpdate(upsert=True), and/or key the identifier on username only (or on X-Forwarded-For when behind a proxy)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Low priority) Harden brute-force counter in /api/auth/login: use $inc atomically and consider using username-only or trusted X-Forwarded-For as identifier so lockout triggers at exactly 5 regardless of ingress replica fan-out."
+  ],
+  "critical_code_review_comments": [
+    "server.py login attempt counter uses non-atomic read-modify-write (lines 196-200). Behind K8s ingress with multiple pods this causes 5-attempt lockout to effectively take ~10 attempts.",
+    "Overall code is clean: proper Pydantic validation (EmailStr, Literal budgets, length limits), honeypot field, bcrypt + JWT with 12h expiry, ObjectId excluded from responses via BaseDocument alias, admin seed updates password_hash when env password changes, CORS allows credentials with configurable origins. No MongoDB _id leaks in responses. Good use of indexes on startup.",
+    "Minor: CORS_ORIGINS='*' with allow_credentials=True is permitted by Starlette only because it rewrites to the request origin, but is still a security best-practice concern — set explicit origins in production."
+  ],
+  "updated_files": [
+    "/app/backend/tests/__init__.py",
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "100% (all tested flows)"},
+  "test_credentials": "Admin buildvvo / buildvvo@2026 (works). Login attempts for 'bruteuser_test_lockout' may be locked for up to 15 min from this test run.",
+  "seed_data_creation": "None persisted. All TEST_ prefixed leads created during pytest were deleted by cleanup test. The one UI-submitted lead (TEST_UIUser) was deleted via the admin delete flow at the end. Settings restored to defaults (whatsapp_number=919999999999, phone='+91 99999 99999', email=hello@buildvvo.com, address=India).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "backend_test.py covers all endpoints and is safe to re-run (self-cleaning). Brute-force test uses a dummy username ('bruteuser_test_lockout') and accepts lockout within 15 attempts. UI testids verified: lead-form flow is 4 steps (step 1: contact, step 2: software type, step 3: budget+timeline, step 4: description/submit). Theme toggle data-testid is 'theme-toggle-button'. All admin CRUD + settings flows have reliable data-testid attributes."
+}

@@ -186,18 +186,20 @@ async def get_current_user(request: Request) -> dict:
 @api.post("/auth/login")
 async def login(body: LoginIn, request: Request):
     username = body.username.strip().lower()
-    ip = request.client.host if request.client else "unknown"
+    fwd = request.headers.get("x-forwarded-for", "")
+    ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "unknown")
     identifier = f"{ip}:{username}"
     attempt = await db.login_attempts.find_one({"identifier": identifier})
     if attempt and attempt.get("locked_until") and attempt["locked_until"] > now_iso():
         raise HTTPException(429, "Too many failed attempts. Try again in 15 minutes.")
     user = await db.users.find_one({"username": username})
     if not user or not verify_password(body.password, user["password_hash"]):
-        count = (attempt or {}).get("count", 0) + 1
-        update = {"count": count}
-        if count >= 5:
-            update = {"count": 0, "locked_until": (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()}
-        await db.login_attempts.update_one({"identifier": identifier}, {"$set": update}, upsert=True)
+        doc = await db.login_attempts.find_one_and_update(
+            {"identifier": identifier}, {"$inc": {"count": 1}, "$unset": {"locked_until": ""}},
+            upsert=True, return_document=True)
+        if doc["count"] >= 5:
+            await db.login_attempts.update_one({"identifier": identifier}, {"$set": {
+                "count": 0, "locked_until": (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()}})
         raise HTTPException(401, "Invalid username or password")
     await db.login_attempts.delete_one({"identifier": identifier})
     uid = str(user["_id"])
