@@ -22,7 +22,7 @@ const exportCsv = (leads) => {
   a.click();
 };
 
-export const LeadsPanel = ({ onChange }) => {
+export const LeadsPanel = ({ onChange, canDelete = false }) => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ q: "", status: "", source: "", software_type: "" });
@@ -179,7 +179,7 @@ export const LeadsPanel = ({ onChange }) => {
       </div>
       </>)}
 
-      <LeadSheet lead={active} onClose={() => setActiveId(null)} onUpdate={upsert} onDelete={remove} />
+      <LeadSheet lead={active} onClose={() => setActiveId(null)} onUpdate={upsert} onDelete={remove} canDelete={canDelete} />
     </div>
   );
 };

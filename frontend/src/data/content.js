@@ -1,10 +1,10 @@
 import {
-  Code2, Boxes, Users, Smartphone, Globe, Workflow, Dumbbell, HeartPulse, GraduationCap,
+  Code2, Boxes, Users, Smartphone, Globe, Workflow, Dumbbell, HeartPulse, GraduationCap, MonitorSmartphone,
   Warehouse, Factory, ShoppingBag, Rocket, FileSpreadsheet, Unplug, EyeOff, Clock3, Puzzle, TrendingDown,
 } from "lucide-react";
 
 export const SOFTWARE_TYPES = [
-  "Custom Software", "ERP System", "CRM System", "Web Application", "Mobile App",
+  "Custom Software", "Website", "ERP System", "CRM System", "Web Application", "Mobile App",
   "Inventory Management", "Business Automation", "Not Sure Yet",
 ];
 export const BUDGETS = ["Under ₹50K", "₹50K–₹1.5L", "₹1.5L–₹5L", "₹5L+", "Not Sure"];
@@ -21,6 +21,15 @@ export const SERVICES = [
     seoDesc: "BuildVVO builds custom business software in India — tailored to your workflows, owned by you, and built to scale. Get a free consultation.",
     problems: ["Your team juggles 4–5 tools that don't talk to each other", "Critical data lives in spreadsheets and WhatsApp chats", "Generic SaaS forces you to change how you work", "Monthly per-user subscriptions keep climbing"],
     features: ["Workflow discovery & process mapping", "Role-based access for every team", "Dashboards and reports you actually use", "Integrations with payment, SMS, WhatsApp & accounting tools", "Cloud deployment with backups", "Full source-code ownership"],
+  },
+  {
+    slug: "website-development", title: "Website Development", short: "Websites", icon: MonitorSmartphone, formType: "Website",
+    tagline: "Fast, premium websites that turn visitors into enquiries.",
+    summary: "We design and develop business websites, landing pages and online stores that look credible, load fast, rank on Google and are built to generate leads and sales.",
+    seoTitle: "Website Development Company in India — Business Websites, Landing Pages & E-commerce",
+    seoDesc: "BuildVVO designs and develops fast, SEO-friendly, mobile-first websites, landing pages and e-commerce stores for Indian businesses. Get a free quote.",
+    problems: ["Your website looks outdated and doesn't build trust", "Visitors leave without enquiring or buying", "The site is slow and hard to use on mobile", "You can't update content without calling a developer"],
+    features: ["Custom design — no generic templates", "Mobile-first, fast-loading pages", "SEO-ready structure & Google Analytics", "Lead forms, WhatsApp & call buttons", "E-commerce with UPI / payment gateway", "Easy-to-manage content & admin panel"],
   },
   {
     slug: "erp-development", title: "ERP Development", short: "ERP Systems", icon: Boxes, formType: "ERP System",
@@ -75,8 +84,8 @@ export const INDUSTRIES = [
   { key: "education", name: "Education & Coaching", icon: GraduationCap, pains: ["Fee follow-ups eat staff time", "Attendance on paper registers", "Parents want updates"], build: ["Student & fee management", "Attendance & results", "Parent communication", "Online test & course portals"] },
   { key: "warehouses", name: "Warehouses & Logistics", icon: Warehouse, pains: ["Stock mismatches", "Slow dispatch", "No real-time visibility"], build: ["Inventory & bin tracking", "Inward / outward entries", "Dispatch & delivery tracking", "Barcode / QR workflows"] },
   { key: "manufacturing", name: "Manufacturing", icon: Factory, pains: ["Production planning in Excel", "Raw material shortages", "No costing visibility"], build: ["Production & BOM planning", "Raw material & purchase", "Quality checkpoints", "Job costing reports"] },
-  { key: "retail", name: "Retail & Distribution", icon: ShoppingBag, pains: ["Billing and stock out of sync", "Multiple outlets, no central view", "Dealer orders over phone"], build: ["POS & GST billing", "Multi-outlet inventory", "Dealer / distributor ordering apps", "Loyalty & customer data"] },
-  { key: "startups", name: "Startups", icon: Rocket, pains: ["Idea but no tech team", "Need an MVP fast and on budget", "Must scale after launch"], build: ["MVP design & development", "SaaS platforms", "Mobile apps", "Scalable cloud architecture"] },
+  { key: "retail", name: "Retail & Distribution", icon: ShoppingBag, pains: ["Billing and stock out of sync", "Multiple outlets, no central view", "Dealer orders over phone"], build: ["POS & GST billing", "Multi-outlet inventory", "Dealer / distributor ordering apps", "Business website & online store"] },
+  { key: "startups", name: "Startups", icon: Rocket, pains: ["Idea but no tech team", "Need an MVP fast and on budget", "Must scale after launch"], build: ["MVP design & development", "Launch websites & landing pages", "SaaS platforms & mobile apps", "Scalable cloud architecture"] },
 ];
 
 export const PROBLEMS = [

@@ -69,6 +69,7 @@ class BaseDocument(BaseModel):
 
 class Note(BaseModel):
     text: str
+    author: str = ""
     created_at: str = Field(default_factory=now_iso)
 
 
@@ -130,6 +131,21 @@ class LoginIn(BaseModel):
     password: str
 
 
+USERNAME_RX = r"^[a-z0-9._-]{3,30}$"
+
+
+class UserCreate(BaseModel):
+    username: str = Field(pattern=USERNAME_RX)
+    name: str = Field(min_length=2, max_length=80)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=2, max_length=80)
+    password: Optional[str] = Field(default=None, min_length=8, max_length=128)
+    active: Optional[bool] = None
+
+
 class SettingsIn(BaseModel):
     whatsapp_number: str = Field(max_length=20)
     phone: str = Field(max_length=30)
@@ -178,9 +194,28 @@ async def get_current_user(request: Request) -> dict:
     if payload.get("type") != "access":
         raise HTTPException(401, "Invalid token type")
     user = await db.users.find_one({"_id": ObjectId(payload["sub"])}, {"password_hash": 0})
-    if not user:
-        raise HTTPException(401, "User not found")
-    return {"id": str(user["_id"]), "username": user["username"], "email": user.get("email", ""), "role": user.get("role")}
+    if not user or not user.get("active", True):
+        raise HTTPException(401, "User not found or disabled")
+    return public_user(user)
+
+
+def public_user(u: dict) -> dict:
+    return {"id": str(u["_id"]), "username": u["username"], "name": u.get("name", ""), "email": u.get("email", ""),
+            "role": u.get("role"), "active": u.get("active", True), "created_at": u.get("created_at")}
+
+
+PERMS = {
+    "admin": {"leads:read", "leads:write", "leads:delete", "stats", "settings", "users"},
+    "sales": {"leads:read", "leads:write"},
+}
+
+
+def require(perm: str):
+    async def dep(user: dict = Depends(get_current_user)) -> dict:
+        if perm not in PERMS.get(user.get("role"), set()):
+            raise HTTPException(403, "You don't have permission to do this")
+        return user
+    return dep
 
 
 @api.post("/auth/login")
@@ -193,7 +228,7 @@ async def login(body: LoginIn, request: Request):
     if attempt and attempt.get("locked_until") and attempt["locked_until"] > now_iso():
         raise HTTPException(429, "Too many failed attempts. Try again in 15 minutes.")
     user = await db.users.find_one({"username": username})
-    if not user or not verify_password(body.password, user["password_hash"]):
+    if not user or not user.get("active", True) or not verify_password(body.password, user["password_hash"]):
         doc = await db.login_attempts.find_one_and_update(
             {"identifier": identifier}, {"$inc": {"count": 1}, "$unset": {"locked_until": ""}},
             upsert=True, return_document=True)
@@ -204,7 +239,7 @@ async def login(body: LoginIn, request: Request):
     await db.login_attempts.delete_one({"identifier": identifier})
     uid = str(user["_id"])
     return {"token": create_access_token(uid, username),
-            "user": {"id": uid, "username": username, "email": user.get("email", ""), "role": user.get("role")}}
+            "user": public_user(user)}
 
 
 @api.get("/auth/me")
@@ -249,11 +284,57 @@ async def create_event(body: EventIn):
 
 # ---------- Admin ----------
 @api.put("/settings")
-async def update_settings(body: SettingsIn, user: dict = Depends(get_current_user)):
+async def update_settings(body: SettingsIn, user: dict = Depends(require("settings"))):
     data = body.model_dump()
     data["whatsapp_number"] = re.sub(r"\D", "", data["whatsapp_number"])
     await db.settings.update_one({"_id": "site"}, {"$set": data}, upsert=True)
     return await load_settings()
+
+
+@api.get("/users")
+async def list_users(user: dict = Depends(require("users"))):
+    docs = await db.users.find({}, {"password_hash": 0}).sort("created_at", 1).to_list(500)
+    return [public_user(d) for d in docs]
+
+
+@api.post("/users", status_code=201)
+async def create_user(body: UserCreate, user: dict = Depends(require("users"))):
+    username = body.username.strip().lower()
+    if await db.users.find_one({"username": username}):
+        raise HTTPException(409, "Username already exists")
+    doc = {"username": username, "name": body.name.strip(), "email": "", "role": "sales", "active": True,
+           "password_hash": hash_password(body.password), "created_at": now_iso(), "created_by": user["username"]}
+    res = await db.users.insert_one(doc)
+    doc["_id"] = res.inserted_id
+    return public_user(doc)
+
+
+async def sales_user(user_id: str) -> dict:
+    target = await db.users.find_one({"_id": oid(user_id)}) if ObjectId.is_valid(user_id) else None
+    if not target or target.get("role") != "sales":
+        raise HTTPException(404, "User not found")
+    return target
+
+
+@api.patch("/users/{user_id}")
+async def update_user(user_id: str, body: UserUpdate, user: dict = Depends(require("users"))):
+    await sales_user(user_id)
+    update = {}
+    if body.name is not None:
+        update["name"] = body.name.strip()
+    if body.active is not None:
+        update["active"] = body.active
+    if body.password:
+        update["password_hash"] = hash_password(body.password)
+    doc = await db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": update}, return_document=True)
+    return public_user(doc)
+
+
+@api.delete("/users/{user_id}")
+async def delete_user(user_id: str, user: dict = Depends(require("users"))):
+    await sales_user(user_id)
+    await db.users.delete_one({"_id": ObjectId(user_id)})
+    return {"ok": True}
 
 
 def oid(lead_id: str) -> ObjectId:
@@ -265,7 +346,7 @@ def oid(lead_id: str) -> ObjectId:
 @api.get("/leads")
 async def list_leads(
     q: str = "", status: str = "", source: str = "", software_type: str = "",
-    user: dict = Depends(get_current_user),
+    user: dict = Depends(require("leads:read")),
 ):
     query = {}
     if status:
@@ -282,7 +363,7 @@ async def list_leads(
 
 
 @api.get("/leads/{lead_id}")
-async def get_lead(lead_id: str, user: dict = Depends(get_current_user)):
+async def get_lead(lead_id: str, user: dict = Depends(require("leads:read"))):
     doc = await db.leads.find_one({"_id": oid(lead_id)})
     if not doc:
         raise HTTPException(404, "Lead not found")
@@ -290,7 +371,7 @@ async def get_lead(lead_id: str, user: dict = Depends(get_current_user)):
 
 
 @api.patch("/leads/{lead_id}")
-async def update_lead(lead_id: str, body: LeadUpdate, user: dict = Depends(get_current_user)):
+async def update_lead(lead_id: str, body: LeadUpdate, user: dict = Depends(require("leads:write"))):
     update = {k: v for k, v in body.model_dump(exclude={"clear_follow_up"}).items() if v is not None}
     if body.clear_follow_up:
         update["follow_up_date"] = None
@@ -302,8 +383,8 @@ async def update_lead(lead_id: str, body: LeadUpdate, user: dict = Depends(get_c
 
 
 @api.post("/leads/{lead_id}/notes")
-async def add_note(lead_id: str, body: NoteCreate, user: dict = Depends(get_current_user)):
-    note = Note(text=body.text.strip()).model_dump()
+async def add_note(lead_id: str, body: NoteCreate, user: dict = Depends(require("leads:write"))):
+    note = Note(text=body.text.strip(), author=user.get("name") or user["username"]).model_dump()
     doc = await db.leads.find_one_and_update(
         {"_id": oid(lead_id)}, {"$push": {"notes": note}, "$set": {"updated_at": now_iso()}}, return_document=True)
     if not doc:
@@ -312,7 +393,7 @@ async def add_note(lead_id: str, body: NoteCreate, user: dict = Depends(get_curr
 
 
 @api.delete("/leads/{lead_id}")
-async def delete_lead(lead_id: str, user: dict = Depends(get_current_user)):
+async def delete_lead(lead_id: str, user: dict = Depends(require("leads:delete"))):
     res = await db.leads.delete_one({"_id": oid(lead_id)})
     if not res.deleted_count:
         raise HTTPException(404, "Lead not found")
@@ -320,7 +401,7 @@ async def delete_lead(lead_id: str, user: dict = Depends(get_current_user)):
 
 
 @api.get("/stats")
-async def stats(user: dict = Depends(get_current_user)):
+async def stats(user: dict = Depends(require("stats"))):
     leads = await db.leads.find({}, {"status": 1, "source": 1, "software_type": 1, "budget": 1, "name": 1, "company": 1,
                                      "consultation": 1, "created_at": 1, "follow_up_date": 1}).to_list(10000)
     brief = lambda l: {"id": str(l["_id"]), "name": l.get("name"), "company": l.get("company", ""), "status": l.get("status"),
@@ -401,7 +482,7 @@ async def startup():
     password = os.environ["ADMIN_PASSWORD"]
     existing = await db.users.find_one({"username": username})
     if existing is None:
-        await db.users.insert_one({"username": username, "email": os.environ.get("ADMIN_EMAIL", ""),
+        await db.users.insert_one({"username": username, "name": "Admin", "active": True, "email": os.environ.get("ADMIN_EMAIL", ""),
                                    "password_hash": hash_password(password), "role": "admin",
                                    "created_at": now_iso()})
     elif not verify_password(password, existing["password_hash"]):

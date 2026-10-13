@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, Inbox, LogOut, Settings, ExternalLink } from "lucide-react";
+import { BarChart3, Inbox, LogOut, Settings, ExternalLink, UsersRound } from "lucide-react";
+import { TeamPanel } from "../../components/admin/TeamPanel";
 import { api, TOKEN_KEY } from "../../lib/api";
 import { usePageMeta } from "../../lib/seo";
 import { Logo } from "../../components/site/Logo";
@@ -9,10 +10,11 @@ import { Overview } from "../../components/admin/Overview";
 import { LeadsPanel } from "../../components/admin/LeadsPanel";
 import { SettingsPanel } from "../../components/admin/SettingsPanel";
 
-const TABS = [
-  { id: "overview", label: "Overview", icon: BarChart3 },
-  { id: "leads", label: "Leads", icon: Inbox },
-  { id: "settings", label: "Settings", icon: Settings },
+const ALL_TABS = [
+  { id: "overview", label: "Overview", icon: BarChart3, roles: ["admin"] },
+  { id: "leads", label: "Leads", icon: Inbox, roles: ["admin", "sales"] },
+  { id: "team", label: "Team", icon: UsersRound, roles: ["admin"] },
+  { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ];
 
 export default function AdminDashboard() {
@@ -30,17 +32,23 @@ export default function AdminDashboard() {
   const loadStats = useCallback(() => api.get("/stats").then(({ data }) => setStats(data)).catch(() => {}), []);
 
   useEffect(() => {
-    api.get("/auth/me").then(({ data }) => { setUser(data); loadStats(); }).catch(logout);
+    api.get("/auth/me").then(({ data }) => {
+      setUser(data);
+      if (data.role === "admin") loadStats(); else setTab("leads");
+    }).catch(logout);
   }, [logout, loadStats]);
 
   if (!user) return <div className="min-h-screen grid place-items-center text-muted-foreground" data-testid="admin-loading">Loading…</div>;
+  const isAdmin = user.role === "admin";
+  const TABS = ALL_TABS.filter((t) => t.roles.includes(user.role));
+  const onLeadsChange = isAdmin ? loadStats : () => {};
 
   return (
     <div className="min-h-screen bg-secondary/40" data-testid="admin-dashboard">
       <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="mx-auto max-w-[1400px] px-4 sm:px-8 h-16 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0"><Logo /><span className="hidden lg:inline rounded-full bg-primary/10 text-primary font-mono text-[10px] uppercase tracking-widest px-2.5 py-1">Admin</span></div>
-          <nav className="hidden md:flex items-center gap-1 rounded-full border border-border bg-card p-1">
+          <div className="flex items-center gap-3 min-w-0"><Logo /><span className="hidden lg:inline rounded-full bg-primary/10 text-primary font-mono text-[10px] uppercase tracking-widest px-2.5 py-1" data-testid="admin-role-badge">{isAdmin ? "Admin" : `Sales · ${user.name || user.username}`}</span></div>
+          <nav className={`hidden ${TABS.length > 1 ? "md:flex" : ""} items-center gap-1 rounded-full border border-border bg-card p-1`}>
             {TABS.map((t) => (
               <button key={t.id} onClick={() => setTab(t.id)} data-testid={`admin-tab-${t.id}`}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-colors ${tab === t.id ? "bg-navy text-cream dark:bg-cream dark:text-navy" : "text-muted-foreground hover:text-foreground"}`}>
@@ -57,11 +65,12 @@ export default function AdminDashboard() {
       </header>
       <main className="mx-auto max-w-[1400px] px-4 sm:px-8 pt-6 pb-28 sm:py-10">
         {tab === "overview" && <Overview stats={stats} onGoLeads={() => setTab("leads")} />}
-        {tab === "leads" && <LeadsPanel onChange={loadStats} />}
-        {tab === "settings" && <SettingsPanel />}
+        {tab === "leads" && <LeadsPanel onChange={onLeadsChange} canDelete={isAdmin} />}
+        {tab === "team" && isAdmin && <TeamPanel />}
+        {tab === "settings" && isAdmin && <SettingsPanel />}
       </main>
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]" data-testid="admin-mobile-tabbar">
-        <div className="grid grid-cols-3">
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] ${TABS.length < 2 ? "hidden" : ""}`} data-testid="admin-mobile-tabbar">
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${TABS.length}, minmax(0, 1fr))` }}>
           {TABS.map((t) => (
             <button key={t.id} onClick={() => { setTab(t.id); window.scrollTo(0, 0); }} data-testid={`admin-mobile-tab-${t.id}`}
               className={`flex flex-col items-center gap-1 py-3 text-[11px] font-medium transition-colors ${tab === t.id ? "text-primary" : "text-muted-foreground"}`}>

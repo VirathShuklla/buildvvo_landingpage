@@ -26,7 +26,7 @@ export default function About() {
         </Reveal>
         <Reveal delay={0.08} className="space-y-5 text-muted-foreground text-base md:text-lg leading-relaxed">
           <p>Most businesses don't struggle because of a lack of effort — they struggle because their tools don't match how they work. Teams end up juggling spreadsheets, messaging apps and generic software that was never designed for their processes.</p>
-          <p>BuildVVO was founded to change that. We sit down with business owners, understand their operations in detail and build focused software — ERP, CRM, web and mobile apps, and automations — that removes friction and gives them clear visibility into their business.</p>
+          <p>BuildVVO was founded to change that. We sit down with business owners, understand their operations in detail and build focused solutions — business websites, ERP, CRM, web and mobile apps, and automations — that remove friction and give them clear visibility into their business.</p>
           <p>We work with gyms, clinics, schools, warehouses, manufacturers, retailers and startups across India.</p>
         </Reveal>
       </section>

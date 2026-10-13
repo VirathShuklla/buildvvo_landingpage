@@ -17,7 +17,7 @@ const Hero = () => (
     <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" />
     <div className="container-x relative pt-14 pb-20 sm:pt-20 lg:pt-24 lg:pb-28 grid gap-16 lg:grid-cols-[1.05fr_1fr] items-center">
       <Reveal>
-        <p className="eyebrow mb-6 inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" />Custom software development · India</p>
+        <p className="eyebrow mb-6 inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" />Custom software & website development · India</p>
         <h1 data-testid="hero-headline" className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4.4rem] font-extrabold leading-[1.02]">
           Your Business Is Unique. <span className="text-primary">Your Software Should Be Too.</span>
         </h1>
@@ -63,22 +63,31 @@ const Problems = () => (
 const Services = () => (
   <section className="container-x section-y" data-testid="services-section">
     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-      <SectionHead eyebrow="What we build" title="Software built around your operations." text="From a single automation to a company-wide ERP — designed, built and supported by one accountable team." />
+      <SectionHead eyebrow="What we build" title="Software and websites built around your business." text="From a high-converting website to a company-wide ERP — designed, built and supported by one accountable team." />
       <CTAButton to="/services" variant="ghost" data-testid="home-all-services-button">All services</CTAButton>
     </div>
-    <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {SERVICES.map((s, i) => (
         <Reveal key={s.slug} delay={i * 0.05}>
-          <Link to={`/services/${s.slug}`} data-testid={`home-service-card-${s.slug}`} className="lift group flex h-full flex-col rounded-[22px] border border-border bg-card p-8">
+          <Link to={`/services/${s.slug}`} data-testid={`home-service-card-${s.slug}`} className="lift group flex h-full flex-col rounded-[22px] border border-border bg-card p-7">
             <div className="flex items-start justify-between">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary"><s.icon className="h-5 w-5" /></span>
               <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
             </div>
-            <h3 className="mt-8 text-2xl font-bold">{s.title}</h3>
+            <h3 className="mt-8 text-xl sm:text-2xl font-bold">{s.title}</h3>
             <p className="mt-3 text-muted-foreground text-[15px] leading-relaxed">{s.tagline}</p>
           </Link>
         </Reveal>
       ))}
+      <Reveal delay={0.35}>
+        <Link to="/contact" data-testid="home-service-card-not-sure" className="group flex h-full flex-col justify-between rounded-[22px] bg-primary text-white p-7 transition-colors hover:bg-[#3651D4]">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/70">Not sure what you need?</p>
+            <h3 className="mt-6 text-xl sm:text-2xl font-bold">Tell us the problem. We'll suggest the right solution.</h3>
+          </div>
+          <span className="mt-8 inline-flex items-center gap-2 text-sm font-medium">Free consultation <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>
+        </Link>
+      </Reveal>
     </div>
   </section>
 );

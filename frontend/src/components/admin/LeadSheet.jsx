@@ -18,7 +18,7 @@ const Row = ({ label, children }) => (
   </div>
 );
 
-export const LeadSheet = ({ lead, onClose, onUpdate, onDelete }) => {
+export const LeadSheet = ({ lead, onClose, onUpdate, onDelete, canDelete }) => {
   const [note, setNote] = useState("");
   const [source, setSource] = useState("");
   useEffect(() => { setSource(lead?.source || ""); setNote(""); }, [lead?.id, lead?.source]);
@@ -121,13 +121,13 @@ export const LeadSheet = ({ lead, onClose, onUpdate, onDelete }) => {
                 {[...lead.notes].reverse().map((n, i) => (
                   <li key={i} className="rounded-xl border border-border p-3.5">
                     <p className="text-sm whitespace-pre-wrap">{n.text}</p>
-                    <p className="mt-1.5 text-[11px] text-muted-foreground">{fmt(n.created_at)}</p>
+                    <p className="mt-1.5 text-[11px] text-muted-foreground">{n.author ? `${n.author} · ` : ""}{fmt(n.created_at)}</p>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <AlertDialog>
+            {canDelete && <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button data-testid="lead-detail-delete-button" className="inline-flex items-center gap-2 text-sm text-destructive hover:underline"><Trash2 className="h-4 w-4" />Delete lead</button>
               </AlertDialogTrigger>
@@ -141,7 +141,7 @@ export const LeadSheet = ({ lead, onClose, onUpdate, onDelete }) => {
                   <AlertDialogAction onClick={del} data-testid="lead-delete-confirm" className="bg-destructive text-white hover:bg-destructive/90">Delete</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-            </AlertDialog>
+            </AlertDialog>}
           </div>
         )}
       </SheetContent>

@@ -46,8 +46,8 @@ export default function AdminLogin() {
         <form onSubmit={submit} className="m-auto w-full max-w-sm space-y-5" data-testid="admin-login-form">
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary"><Lock className="h-5 w-5" /></span>
           <div>
-            <h2 className="text-3xl font-extrabold">Admin sign in</h2>
-            <p className="mt-2 text-muted-foreground text-sm">Access the BuildVVO lead dashboard.</p>
+            <h2 className="text-3xl font-extrabold">Team sign in</h2>
+            <p className="mt-2 text-muted-foreground text-sm">Admins and sales team members sign in here.</p>
           </div>
           <input data-testid="admin-login-username-input" className={input} placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required />
           <input data-testid="admin-login-password-input" className={input} type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
